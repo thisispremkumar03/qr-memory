@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Memory — Admin Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
+
+  <div class="admin-box">
+    <h2>Admin Login</h2>
+
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="you@example.com" />
+
+    <label>Password</label>
+    <input type="password" id="login-password" placeholder="Your password" />
+
+    <button id="login-btn" class="cta-btn">Log In</button>
+
+    <p id="login-msg"></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="login.js"></script>
+</body>
+</html>
