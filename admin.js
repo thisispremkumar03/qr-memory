@@ -1,5 +1,3 @@
-alert("QRCode loaded? " + (typeof QRCode));
-
 const SUPABASE_URL = "https://zxylnqmopokqmqomfmmz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_YxhoRW9CoiDIYl5Pxdy4ng_wk1qQOkI";
 
