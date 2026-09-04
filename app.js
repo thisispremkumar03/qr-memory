@@ -12,20 +12,21 @@ const memoryId = urlParams.get("id");
 // ===== STEP B: Fetch the matching memory + fill the page =====
 async function loadMemory() {
   if (!memoryId) {
-    console.error("No memory ID found in the URL. Add ?id=ABC123 to the link.");
+    document.querySelector(".memory-card").innerHTML =
+      `<p style="color:red; padding:20px;">⚠️ No memory ID found in the URL.</p>`;
     return;
   }
-
   const { data, error } = await supabaseClient
     .from("memories")
     .select("*")
     .eq("memory_id", memoryId)
     .single();
 
-  if (error) {
-    console.error("Could not load this memory:", error);
-    return;
-  }
+    if (error) {
+      document.querySelector(".memory-card").innerHTML =
+        `<p style="color:red; padding:20px;">⚠️ Could not load this memory.<br><br>Error: ${error.message}</p>`;
+      return;
+    }
 
   console.log("Loaded memory:", data);
   fillPage(data);
