@@ -29,8 +29,9 @@
     <label>Song/Video URL (optional)</label>
     <input type="text" id="input-song" placeholder="https://..." />
 
-    <label>Photo URLs (comma-separated, optional for now)</label>
-    <textarea id="input-photos" rows="2" placeholder="https://url1.jpg, https://url2.jpg"></textarea>
+    <label>Upload Photos (1–5 images)</label>
+    <input type="file" id="input-photo-files" accept="image/*" multiple />
+    <p id="upload-status" style="font-size:13px; color:#888; margin-top:6px;"></p>
 
     <button id="create-btn" class="cta-btn">Create Memory</button>
 
