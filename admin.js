@@ -1,46 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Memory — Admin</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="admin-body">
+const SUPABASE_URL = "https://zxylnqmopokqmqomfmmz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YxhoRW9CoiDIYl5Pxdy4ng_wk1qQOkI";
 
-  <div class="admin-box">
-    <h2>Create a New Memory</h2>
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <label>Memory ID (unique code)</label>
-    <input type="text" id="input-memory-id" placeholder="e.g. ABC123" />
+document.getElementById("create-btn").addEventListener("click", async () => {
 
-    <label>Name 1</label>
-    <input type="text" id="input-name1" placeholder="e.g. Rahul" />
+  alert("Button clicked!");
 
-    <label>Name 2 (optional)</label>
-    <input type="text" id="input-name2" placeholder="e.g. Priya" />
+  const memoryId = document.getElementById("input-memory-id").value.trim();
+  const name1 = document.getElementById("input-name1").value.trim();
+  const name2 = document.getElementById("input-name2").value.trim();
+  const message = document.getElementById("input-message").value.trim();
+  const memoryDate = document.getElementById("input-date").value;
+  const songUrl = document.getElementById("input-song").value.trim();
+  const photoFiles = document.getElementById("input-photo-files").files;
+  const uploadStatus = document.getElementById("upload-status");
 
-    <label>Message</label>
-    <textarea id="input-message" rows="3" placeholder="Write the personal message..."></textarea>
+  let photoUrls = "";
 
-    <label>Date</label>
-    <input type="date" id="input-date" />
+  alert("Reached photo check. Files: " + photoFiles.length);
 
-    <label>Song/Video URL (optional)</label>
-    <input type="text" id="input-song" placeholder="https://..." />
+  if (photoFiles.length > 0) {
+    uploadStatus.textContent = "Uploading photos...";
+    const uploadedUrls = [];
 
-    <label>Upload Photos (1–5 images)</label>
-    <input type="file" id="input-photo-files" accept="image/*" multiple />
-    <p id="upload-status" style="font-size:13px; color:#888; margin-top:6px;"></p>
+    for (let i = 0; i < photoFiles.length; i++) {
+      const file = photoFiles[i];
+      const fileName = `${memoryId}-${Date.now()}-${i}.${file.name.split('.').pop()}`;
 
-    <button id="create-btn" class="cta-btn">Create Memory</button>
+      const { data: uploadData, error: uploadError } = await supabaseClient
+        .storage
+        .from("memory-photos")
+        .upload(fileName, file);
 
-    <p id="result-msg"></p>
-    <div id="qr-output"></div>
-  </div>
+      if (uploadError) {
+        uploadStatus.textContent = "❌ Photo upload failed: " + uploadError.message;
+        return;
+      }
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <script src="admin.js"></script>
-</body>
-</html>
+      const { data: urlData } = supabaseClient
+        .storage
+        .from("memory-photos")
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(urlData.publicUrl);
+    }
+
+    photoUrls = uploadedUrls.join(",");
+    uploadStatus.textContent = "✅ Photos uploaded!";
+  }
+
+  const resultMsg = document.getElementById("result-msg");
+
+  if (!memoryId || !name1) {
+    resultMsg.textContent = "⚠️ Memory ID and Name 1 are required.";
+    resultMsg.style.color = "red";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("memories")
+    .insert([
+      {
+        memory_id: memoryId,
+        name1: name1,
+        name2: name2,
+        message: message,
+        memory_date: memoryDate || null,
+        song_url: songUrl || null,
+        photo_urls: photoUrls || null
+      }
+    ]);
+
+  if (error) {
+    console.error(error);
+    resultMsg.textContent = "❌ Error: " + error.message;
+    resultMsg.style.color = "red";
+    return;
+  }
+
+  resultMsg.textContent = `✅ Memory created!`;
+  resultMsg.style.color = "green";
+
+  // ===== Build the full memory URL =====
+  // For now (local testing), we use the local address.
+  // Later, once deployed, we'll change this to your real domain.
+  const memoryUrl = `${window.location.origin}/memory.html?id=${memoryId}`;
+
+  // ===== Generate and display the QR code =====
+  const qrContainer = document.getElementById("qr-output");
+  qrContainer.innerHTML = ""; // clear any old QR code
+
+  const canvas = document.createElement("canvas");
+  qrContainer.appendChild(canvas);
+
+  QRCode.toCanvas(canvas, memoryUrl, { width: 200 }, function (err) {
+    if (err) console.error(err);
+  });
+
+  // Show the link as text too, and make it clickable
+  const linkText = document.createElement("p");
+  linkText.innerHTML = `<a href="${memoryUrl}" target="_blank">${memoryUrl}</a>`;
+  qrContainer.appendChild(linkText);
+});
