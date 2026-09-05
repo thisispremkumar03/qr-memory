@@ -1,5 +1,16 @@
 /* ===== MEMORY PAGE — REDESIGNED ===== */
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 .memory-body {
   font-family: 'Segoe UI', 'Poppins', sans-serif;
   background: linear-gradient(160deg, #ffe3ea 0%, #ffd1dc 40%, #ffc4d6 100%);
