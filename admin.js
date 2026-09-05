@@ -1,67 +1,46 @@
-const SUPABASE_URL = "https://zxylnqmopokqmqomfmmz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_YxhoRW9CoiDIYl5Pxdy4ng_wk1qQOkI";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Memory — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <div class="admin-box">
+    <h2>Create a New Memory</h2>
 
-document.getElementById("create-btn").addEventListener("click", async () => {
-  const memoryId = document.getElementById("input-memory-id").value.trim();
-  const name1 = document.getElementById("input-name1").value.trim();
-  const name2 = document.getElementById("input-name2").value.trim();
-  const message = document.getElementById("input-message").value.trim();
-  const memoryDate = document.getElementById("input-date").value;
-  const songUrl = document.getElementById("input-song").value.trim();
-  const photoUrls = document.getElementById("input-photos").value.trim();
+    <label>Memory ID (unique code)</label>
+    <input type="text" id="input-memory-id" placeholder="e.g. ABC123" />
 
-  const resultMsg = document.getElementById("result-msg");
+    <label>Name 1</label>
+    <input type="text" id="input-name1" placeholder="e.g. Rahul" />
 
-  if (!memoryId || !name1) {
-    resultMsg.textContent = "⚠️ Memory ID and Name 1 are required.";
-    resultMsg.style.color = "red";
-    return;
-  }
+    <label>Name 2 (optional)</label>
+    <input type="text" id="input-name2" placeholder="e.g. Priya" />
 
-  const { data, error } = await supabaseClient
-    .from("memories")
-    .insert([
-      {
-        memory_id: memoryId,
-        name1: name1,
-        name2: name2,
-        message: message,
-        memory_date: memoryDate || null,
-        song_url: songUrl || null,
-        photo_urls: photoUrls || null
-      }
-    ]);
+    <label>Message</label>
+    <textarea id="input-message" rows="3" placeholder="Write the personal message..."></textarea>
 
-  if (error) {
-    console.error(error);
-    resultMsg.textContent = "❌ Error: " + error.message;
-    resultMsg.style.color = "red";
-    return;
-  }
+    <label>Date</label>
+    <input type="date" id="input-date" />
 
-  resultMsg.textContent = `✅ Memory created!`;
-  resultMsg.style.color = "green";
+    <label>Song/Video URL (optional)</label>
+    <input type="text" id="input-song" placeholder="https://..." />
 
-  // ===== Build the full memory URL =====
-  // For now (local testing), we use the local address.
-  // Later, once deployed, we'll change this to your real domain.
-  const memoryUrl = `${window.location.origin}/memory.html?id=${memoryId}`;
+    <label>Upload Photos (1–5 images)</label>
+    <input type="file" id="input-photo-files" accept="image/*" multiple />
+    <p id="upload-status" style="font-size:13px; color:#888; margin-top:6px;"></p>
 
-  // ===== Generate and display the QR code =====
-  const qrContainer = document.getElementById("qr-output");
-  qrContainer.innerHTML = ""; // clear any old QR code
+    <button id="create-btn" class="cta-btn">Create Memory</button>
 
-  const canvas = document.createElement("canvas");
-  qrContainer.appendChild(canvas);
+    <p id="result-msg"></p>
+    <div id="qr-output"></div>
+  </div>
 
-  QRCode.toCanvas(canvas, memoryUrl, { width: 200 }, function (err) {
-    if (err) console.error(err);
-  });
-
-  // Show the link as text too, and make it clickable
-  const linkText = document.createElement("p");
-  linkText.innerHTML = `<a href="${memoryUrl}" target="_blank">${memoryUrl}</a>`;
-  qrContainer.appendChild(linkText);
-});
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
