@@ -73,10 +73,12 @@ html, body {
 
 .main-photo {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+  background: #fdf2f4;
 }
 
 .message {
