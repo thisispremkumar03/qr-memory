@@ -3,30 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Memory — Give Someone a Memory, Not a Gift</title>
+  <title>Our Memories — Give Them a Memory, Not Just a Gift</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="landing-body">
 
   <!-- HERO SECTION -->
   <section class="hero">
-    <p class="brand-name">QR MEMORY</p>
-    <h1>Give Someone a Memory,<br />Not a Gift.</h1>
+    <p class="brand-name">OUR MEMORIES</p>
+    <h1>Give them a memory,<br />not just a gift.</h1>
     <p class="hero-sub">
-      A personalized card with a QR code that opens a beautiful digital memory —
-      their photos, your message, your song. Forever scannable.
+      Personalized gifts that hold real moments — photos, messages, songs, and more.
+      Something they'll actually keep.
     </p>
-    <a href="#order" class="cta-btn">Order Now</a>
+    <a href="products.html" class="cta-btn">Explore Gifts</a>
   </section>
 
-  <!-- WHAT IS IT -->
+  <!-- FEATURED PRODUCTS -->
+  <section class="section alt-bg">
+    <h2>Featured Gifts</h2>
+    <div id="featured-products" class="product-grid">
+      <p style="color:#999;">Loading gifts...</p>
+    </div>
+  </section>
+
+  <!-- GIFTS FOR EVERY STORY -->
   <section class="section">
-    <h2>What is QR Memory?</h2>
-    <p class="section-text">
-      QR Memory turns your favorite moment into a physical card. Scan the QR code
-      and a personal mini-website opens — with photos, names, a message, a date,
-      and even a song. It's a gift they'll actually keep.
-    </p>
+    <h2>Gifts for Every Story</h2>
+    <div class="story-grid">
+      <div class="story-tag">For Couples</div>
+      <div class="story-tag">For Best Friends</div>
+      <div class="story-tag">For Birthdays</div>
+      <div class="story-tag">For Anniversaries</div>
+      <div class="story-tag">For Long Distance</div>
+      <div class="story-tag">For Someone Special</div>
+    </div>
   </section>
 
   <!-- HOW IT WORKS -->
@@ -35,29 +46,55 @@
     <div class="steps-grid">
       <div class="step-box">
         <p class="step-num">1</p>
-        <p class="step-title">Send us your details</p>
-        <p class="step-desc">Names, photos, message, and a song — via WhatsApp.</p>
+        <p class="step-title">Choose your gift</p>
       </div>
       <div class="step-box">
         <p class="step-num">2</p>
-        <p class="step-title">We create your memory page</p>
-        <p class="step-desc">A personalized page just for you, with a unique QR code.</p>
+        <p class="step-title">Personalize it</p>
       </div>
       <div class="step-box">
         <p class="step-num">3</p>
-        <p class="step-title">You get a printed card</p>
-        <p class="step-desc">A beautiful physical card with the QR on it — ready to gift.</p>
+        <p class="step-title">We create your memory</p>
       </div>
       <div class="step-box">
         <p class="step-num">4</p>
-        <p class="step-title">They scan and relive it</p>
-        <p class="step-desc">One scan opens the memory — anytime, anywhere.</p>
+        <p class="step-title">Gift it to someone special</p>
       </div>
     </div>
   </section>
 
-  <!-- EXAMPLE -->
-  <section class="section">
-    <h2>See an Example</h2>
-    <p class="section-text">Here's what a memory page looks like after scanning:</p>
-    <a href="memory.html"
+  <footer class="footer">
+    <p>Our Memories · Vijayawada · Made with ❤️</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="products.js"></script>
+  <script>
+    async function loadFeaturedProducts() {
+      const products = await fetchAllProducts();
+      const container = document.getElementById("featured-products");
+
+      if (products.length === 0) {
+        container.innerHTML = `<p style="color:#999;">No gifts available right now.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-img-placeholder">🎁</div>
+          <p class="product-name">${product.name}</p>
+          <p class="product-desc">${product.short_description || ""}</p>
+          <p class="product-price">₹${product.price}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    loadFeaturedProducts();
+  </script>
+</body>
+</html>
