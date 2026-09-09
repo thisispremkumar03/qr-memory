@@ -71,11 +71,33 @@
   <script src="products.js"></script>
   <script>
     async function loadFeaturedProducts() {
-      const products = await fetchAllProducts();
       const container = document.getElementById("featured-products");
+      let products = [];
+      let fetchErrorMsg = "";
+
+      try {
+        const { data, error } = await productsClient
+          .from("products")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: true });
+
+        if (error) {
+          fetchErrorMsg = error.message;
+        } else {
+          products = data;
+        }
+      } catch (err) {
+        fetchErrorMsg = err.message;
+      }
+
+      if (fetchErrorMsg) {
+        container.innerHTML = `<p style="color:red;">⚠️ Error loading gifts: ${fetchErrorMsg}</p>`;
+        return;
+      }
 
       if (products.length === 0) {
-        container.innerHTML = `<p style="color:#999;">No gifts available right now.</p>`;
+        container.innerHTML = `<p style="color:#999;">No gifts available right now. (0 rows returned)</p>`;
         return;
       }
 
