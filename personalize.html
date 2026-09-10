@@ -113,17 +113,11 @@
         return;
       }
 
-      resultMsg.textContent = "✅ Your memory has been created!";
+      resultMsg.textContent = "✅ Your gift has been saved! We'll prepare your personalized QR card and it will be revealed only on the physical card we deliver to you.";
       resultMsg.style.color = "green";
 
-      const memoryUrl = `${window.location.origin}/memory.html?id=${memoryId}`;
-
-      document.getElementById("preview-output").innerHTML = `
-        <p style="margin-top:16px; font-size:14px;">
-          Here's a preview of your memory:<br />
-          <a href="${memoryUrl}" target="_blank">${memoryUrl}</a>
-        </p>
-      `;
+      document.getElementById("create-btn").disabled = true;
+      document.getElementById("create-btn").style.opacity = "0.5";
     });
   </script>
 </body>
