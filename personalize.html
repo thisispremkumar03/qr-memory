@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personalize Your Gift — Our Memories</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
+
+  <div class="admin-box">
+    <h2 id="personalize-title">Personalize Your Gift</h2>
+
+    <label>Recipient Name</label>
+    <input type="text" id="input-name1" placeholder="e.g. Priya" />
+
+    <label>Your Name (optional)</label>
+    <input type="text" id="input-name2" placeholder="e.g. Rahul" />
+
+    <label>Personal Message</label>
+    <textarea id="input-message" rows="3" placeholder="Write your message..."></textarea>
+
+    <label>Date (optional)</label>
+    <input type="date" id="input-date" />
+
+    <label>Song/Video URL (optional)</label>
+    <input type="text" id="input-song" placeholder="https://..." />
+
+    <label>Upload Photos (1–5 images)</label>
+    <input type="file" id="input-photo-files" accept="image/*" multiple />
+    <p id="upload-status" style="font-size:13px; color:#888; margin-top:6px;"></p>
+
+    <button id="create-btn" class="cta-btn">Create My Memory</button>
+
+    <p id="result-msg"></p>
+    <div id="preview-output"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="products.js"></script>
+  <script>
+    // Generate a random short Memory ID automatically
+    function generateMemoryId() {
+      return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    document.getElementById("create-btn").addEventListener("click", async () => {
+      const name1 = document.getElementById("input-name1").value.trim();
+      const name2 = document.getElementById("input-name2").value.trim();
+      const message = document.getElementById("input-message").value.trim();
+      const memoryDate = document.getElementById("input-date").value;
+      const songUrl = document.getElementById("input-song").value.trim();
+      const photoFiles = document.getElementById("input-photo-files").files;
+      const uploadStatus = document.getElementById("upload-status");
+      const resultMsg = document.getElementById("result-msg");
+
+      if (!name1 || !message) {
+        resultMsg.textContent = "⚠️ Recipient name and message are required.";
+        resultMsg.style.color = "red";
+        return;
+      }
+
+      const memoryId = generateMemoryId();
+      let photoUrls = "";
+
+      if (photoFiles.length > 0) {
+        uploadStatus.textContent = "Uploading photos...";
+        const uploadedUrls = [];
+
+        for (let i = 0; i < photoFiles.length; i++) {
+          const file = photoFiles[i];
+          const fileName = `${memoryId}-${Date.now()}-${i}.${file.name.split('.').pop()}`;
+
+          const { error: uploadError } = await productsClient
+            .storage
+            .from("memory-photos")
+            .upload(fileName, file);
+
+          if (uploadError) {
+            uploadStatus.textContent = "❌ Photo upload failed: " + uploadError.message;
+            return;
+          }
+
+          const { data: urlData } = productsClient
+            .storage
+            .from("memory-photos")
+            .getPublicUrl(fileName);
+
+          uploadedUrls.push(urlData.publicUrl);
+        }
+
+        photoUrls = uploadedUrls.join(",");
+        uploadStatus.textContent = "✅ Photos uploaded!";
+      }
+
+      const { error } = await productsClient
+        .from("memories")
+        .insert([
+          {
+            memory_id: memoryId,
+            name1: name1,
+            name2: name2,
+            message: message,
+            memory_date: memoryDate || null,
+            song_url: songUrl || null,
+            photo_urls: photoUrls || null
+          }
+        ]);
+
+      if (error) {
+        resultMsg.textContent = "❌ Error: " + error.message;
+        resultMsg.style.color = "red";
+        return;
+      }
+
+      resultMsg.textContent = "✅ Your memory has been created!";
+      resultMsg.style.color = "green";
+
+      const memoryUrl = `${window.location.origin}/memory.html?id=${memoryId}`;
+
+      document.getElementById("preview-output").innerHTML = `
+        <p style="margin-top:16px; font-size:14px;">
+          Here's a preview of your memory:<br />
+          <a href="${memoryUrl}" target="_blank">${memoryUrl}</a>
+        </p>
+      `;
+    });
+  </script>
+</body>
+</html>
