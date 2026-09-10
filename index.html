@@ -116,7 +116,33 @@
       });
     }
 
+    async function loadFeaturedProducts() {
+      const container = document.getElementById("featured-products");
+      const products = await fetchAllProducts();
+
+      if (products.length === 0) {
+        container.innerHTML = `<p style="color:#999;">No gifts available right now — check back soon.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-img-placeholder">🎁</div>
+          <p class="product-name">${product.name}</p>
+          <p class="product-desc">${product.short_description || ""}</p>
+          <p class="product-price">₹${product.price}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     loadFeaturedProducts();
+
+    
   </script>
 </body>
 </html>
