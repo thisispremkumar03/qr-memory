@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Memories</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="landing-body">
+
+  <section class="section" id="product-detail">
+    <p style="color:#999;">Loading gift...</p>
+  </section>
+
+  <footer class="footer">
+    <p>Our Memories · Vijayawada · Made with ❤️</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="products.js"></script>
+  <script>
+    async function loadProductDetail() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id");
+      const container = document.getElementById("product-detail");
+
+      if (!productId) {
+        container.innerHTML = `<p style="color:red;">⚠️ No product specified.</p>`;
+        return;
+      }
+
+      const product = await fetchProductById(productId);
+
+      if (!product) {
+        container.innerHTML = `<p style="color:red;">⚠️ This gift could not be found.</p>`;
+        return;
+      }
+
+      document.title = `${product.name} — Our Memories`;
+
+      container.innerHTML = `
+        <div class="product-detail-card">
+          <div class="product-detail-img">🎁</div>
+          <h1 class="product-detail-name">${product.name}</h1>
+          <p class="product-detail-price">₹${product.price}</p>
+          <p class="product-detail-desc">${product.description || product.short_description || ""}</p>
+          <a href="personalize.html?product=${product.product_id}" class="cta-btn">
+            ${product.requires_qr ? "Customize This Gift" : "Add to Cart"}
+          </a>
+        </div>
+      `;
+    }
+
+    loadProductDetail();
+  </script>
+</body>
+</html>
