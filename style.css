@@ -460,3 +460,40 @@ h1, h2, .names {
 .product-card-link:hover {
   transform: translateY(-2px);
 }
+
+
+.product-detail-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 36px 24px;
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(59,42,34,0.08);
+}
+
+.product-detail-img {
+  font-size: 60px;
+  margin-bottom: 18px;
+}
+
+.product-detail-name {
+  font-size: 24px;
+  color: var(--brown);
+  margin-bottom: 10px;
+  font-family: 'Playfair Display', serif;
+}
+
+.product-detail-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--terracotta);
+  margin-bottom: 18px;
+}
+
+.product-detail-desc {
+  font-size: 14px;
+  color: var(--brown-soft);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
