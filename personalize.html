@@ -38,6 +38,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products.js"></script>
+  <script src="cart.js"></script>
   <script>
     // Generate a random short Memory ID automatically
     function generateMemoryId() {
@@ -45,6 +46,11 @@
     }
 
     document.getElementById("create-btn").addEventListener("click", async () => {
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const productIdParam = urlParams.get("product");
+      const product = await fetchProductById(productIdParam);
+      
       const name1 = document.getElementById("input-name1").value.trim();
       const name2 = document.getElementById("input-name2").value.trim();
       const message = document.getElementById("input-message").value.trim();
@@ -93,6 +99,15 @@
         uploadStatus.textContent = "✅ Photos uploaded!";
       }
 
+
+      addToCart({
+        product_id: product.product_id,
+        name: product.name,
+        price: product.price,
+        memory_id: memoryId,
+        qty: 1
+      });
+
       const { error } = await productsClient
         .from("memories")
         .insert([
@@ -113,11 +128,15 @@
         return;
       }
 
-      resultMsg.textContent = "✅ Your gift has been saved! We'll prepare your personalized QR card and it will be revealed only on the physical card we deliver to you.";
+      resultMsg.textContent = "✅ Your gift has been saved and added to your cart!";
       resultMsg.style.color = "green";
 
       document.getElementById("create-btn").disabled = true;
       document.getElementById("create-btn").style.opacity = "0.5";
+
+      document.getElementById("preview-output").innerHTML = `
+        <a href="cart.html" class="cta-btn" style="margin-top:16px;">View Cart</a>
+      `;
     });
   </script>
 </body>
