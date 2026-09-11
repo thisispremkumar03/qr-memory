@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Our Memories</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
+
+  <div class="admin-box" id="checkout-form-box">
+    <h2>Checkout</h2>
+
+    <div id="checkout-summary" style="background:var(--cream-deep); border-radius:12px; padding:14px; margin-bottom:16px; font-size:14px;"></div>
+
+    <label>Full Name</label>
+    <input type="text" id="input-cname" placeholder="Your full name" />
+
+    <label>Mobile Number</label>
+    <input type="text" id="input-cphone" placeholder="10-digit mobile number" />
+
+    <label>Email (optional)</label>
+    <input type="email" id="input-cemail" placeholder="you@example.com" />
+
+    <label>Address Line 1</label>
+    <input type="text" id="input-addr1" placeholder="House no, building, street" />
+
+    <label>Address Line 2 (optional)</label>
+    <input type="text" id="input-addr2" placeholder="Area, locality" />
+
+    <label>City</label>
+    <input type="text" id="input-city" placeholder="City" />
+
+    <label>State</label>
+    <input type="text" id="input-state" placeholder="State" />
+
+    <label>Pincode</label>
+    <input type="text" id="input-pincode" placeholder="6-digit pincode" />
+
+    <label>Landmark (optional)</label>
+    <input type="text" id="input-landmark" placeholder="Nearby landmark" />
+
+    <label>Payment Method</label>
+    <div style="background:var(--cream-deep); padding:12px; border-radius:8px; font-size:14px; margin-bottom:10px;">
+      💵 Cash on Delivery (COD) — pay when your gift arrives
+    </div>
+
+    <button id="place-order-btn" class="cta-btn">Place Order</button>
+
+    <p id="checkout-msg"></p>
+  </div>
+
+  <div class="admin-box" id="order-success-box" style="display:none; text-align:center;">
+    <h2>🎉 Order Placed!</h2>
+    <p style="color:var(--brown-soft); margin:14px 0;">Your order has been confirmed. We'll prepare your personalized gift and deliver it soon.</p>
+    <p style="font-size:14px; color:var(--brown-soft);">Order ID</p>
+    <p style="font-size:22px; font-weight:700; color:var(--terracotta); margin-bottom:20px;" id="final-order-id"></p>
+    <a href="index.html" class="cta-btn">Back to Home</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="products.js"></script>
+  <script src="cart.js"></script>
+  <script>
+    const cart = getCart();
+    const summaryEl = document.getElementById("checkout-summary");
+
+    if (cart.length === 0) {
+      summaryEl.innerHTML = `<p>Your cart is empty. <a href="products.html">Browse gifts</a></p>`;
+      document.getElementById("place-order-btn").disabled = true;
+    } else {
+      const total = getCartTotal(cart);
+      summaryEl.innerHTML = cart.map(item => `${item.name} — ₹${item.price}`).join("<br>") +
+        `<br><strong>Total: ₹${total}</strong>`;
+    }
+
+    function generateOrderId() {
+      const num = Math.floor(10000 + Math.random() * 90000);
+      return `OM${num}`;
+    }
+
+    document.getElementById("place-order-btn").addEventListener("click", async () => {
+      const name = document.getElementById("input-cname").value.trim();
+      const phone = document.getElementById("input-cphone").value.trim();
+      const email = document.getElementById("input-cemail").value.trim();
+      const addr1 = document.getElementById("input-addr1").value.trim();
+      const addr2 = document.getElementById("input-addr2").value.trim();
+      const city = document.getElementById("input-city").value.trim();
+      const state = document.getElementById("input-state").value.trim();
+      const pincode = document.getElementById("input-pincode").value.trim();
+      const landmark = document.getElementById("input-landmark").value.trim();
+      const msg = document.getElementById("checkout-msg");
+
+      if (!name || !phone || !addr1 || !city || !state || !pincode) {
+        msg.textContent = "⚠️ Please fill all required fields.";
+        msg.style.color = "red";
+        return;
+      }
+
+      const cartNow = getCart();
+      if (cartNow.length === 0) {
+        msg.textContent = "⚠️ Your cart is empty.";
+        msg.style.color = "red";
+        return;
+      }
+
+      const orderId = generateOrderId();
+      const total = getCartTotal(cartNow);
+
+      const { error: orderError } = await productsClient
+        .from("orders")
+        .insert([{
+          order_id: orderId,
+          customer_name: name,
+          customer_phone: phone,
+          customer_email: email || null,
+          address_line1: addr1,
+          address_line2: addr2 || null,
+          city: city,
+          state: state,
+          pincode: pincode,
+          landmark: landmark || null,
+          payment_method: "COD",
+          payment_status: "unpaid",
+          order_status: "pending",
+          total_amount: total
+        }]);
+
+      if (orderError) {
+        msg.textContent = "❌ Error placing order: " + orderError.message;
+        msg.style.color = "red";
+        return;
+      }
+
+      const itemsToInsert = cartNow.map(item => ({
+        order_id: orderId,
+        product_id: item.product_id,
+        product_name: item.name,
+        price: item.price,
+        qty: item.qty || 1,
+        memory_id: item.memory_id || null
+      }));
+
+      const { error: itemsError } = await productsClient
+        .from("order_items")
+        .insert(itemsToInsert);
+
+      if (itemsError) {
+        msg.textContent = "❌ Error saving order items: " + itemsError.message;
+        msg.style.color = "red";
+        return;
+      }
+
+      localStorage.removeItem("om_cart");
+
+      document.getElementById("checkout-form-box").style.display = "none";
+      document.getElementById("order-success-box").style.display = "block";
+      document.getElementById("final-order-id").textContent = orderId;
+    });
+  </script>
+</body>
+</html>
