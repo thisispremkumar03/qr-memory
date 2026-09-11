@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart — Our Memories</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="landing-body">
+
+  <section class="page-header">
+    <p class="brand-name">OUR MEMORIES</p>
+    <h1>Your Cart</h1>
+  </section>
+
+  <section class="section">
+    <div id="cart-items"></div>
+    <div id="cart-summary" style="max-width:420px; margin:20px auto 0; text-align:center;"></div>
+  </section>
+
+  <footer class="footer">
+    <p>Our Memories · Vijayawada · Made with ❤️</p>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const itemsContainer = document.getElementById("cart-items");
+      const summaryContainer = document.getElementById("cart-summary");
+
+      if (cart.length === 0) {
+        itemsContainer.innerHTML = `<p style="text-align:center; color:#999;">Your cart is empty.</p>`;
+        summaryContainer.innerHTML = `<a href="products.html" class="cta-btn">Explore Gifts</a>`;
+        return;
+      }
+
+      itemsContainer.innerHTML = "";
+
+      cart.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "product-card";
+        row.style.cssText = "max-width:420px; margin:0 auto 14px; text-align:left; display:flex; justify-content:space-between; align-items:center;";
+        row.innerHTML = `
+          <div>
+            <p class="product-name" style="margin-bottom:4px;">${item.name}</p>
+            ${item.memory_id ? `<p style="font-size:12px; color:#999;">Personalized gift</p>` : ""}
+            <p class="product-price">₹${item.price}</p>
+          </div>
+          <button class="remove-btn" data-index="${index}" style="background:none; border:none; color:#C1652F; cursor:pointer; font-size:13px;">Remove</button>
+        `;
+        itemsContainer.appendChild(row);
+      });
+
+      const total = getCartTotal(cart);
+      summaryContainer.innerHTML = `
+        <p style="font-size:18px; font-weight:700; color:var(--brown); margin-bottom:16px;">Total: ₹${total}</p>
+        <a href="checkout.html" class="cta-btn">Proceed to Checkout</a>
+      `;
+
+      document.querySelectorAll(".remove-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          removeFromCart(parseInt(btn.getAttribute("data-index")));
+          renderCart();
+        });
+      });
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>
