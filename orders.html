@@ -98,13 +98,56 @@
           <p style="font-size:13px; color:var(--brown-soft);">${order.address_line1}, ${order.city}, ${order.state} - ${order.pincode}</p>
           <p style="font-size:13px; margin-top:6px;">
             <span style="background:#fff; padding:4px 10px; border-radius:12px;">${order.payment_method}</span>
-            <span style="background:#fff; padding:4px 10px; border-radius:12px; margin-left:6px;">${order.order_status}</span>
           </p>
           <p style="font-weight:700; margin-top:8px;">Total: ₹${order.total_amount}</p>
+
+          <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <select class="status-select" data-orderid="${order.order_id}" style="padding:8px; border-radius:8px; border:1px solid #EADFD2; font-size:13px;">
+              <option value="pending" ${order.order_status === "pending" ? "selected" : ""}>Pending</option>
+              <option value="confirmed" ${order.order_status === "confirmed" ? "selected" : ""}>Confirmed</option>
+              <option value="processing" ${order.order_status === "processing" ? "selected" : ""}>Processing</option>
+              <option value="packed" ${order.order_status === "packed" ? "selected" : ""}>Packed</option>
+              <option value="shipped" ${order.order_status === "shipped" ? "selected" : ""}>Shipped</option>
+              <option value="out_for_delivery" ${order.order_status === "out_for_delivery" ? "selected" : ""}>Out for Delivery</option>
+              <option value="delivered" ${order.order_status === "delivered" ? "selected" : ""}>Delivered</option>
+              <option value="cancelled" ${order.order_status === "cancelled" ? "selected" : ""}>Cancelled</option>
+              <option value="returned" ${order.order_status === "returned" ? "selected" : ""}>Returned</option>
+              <option value="refunded" ${order.order_status === "refunded" ? "selected" : ""}>Refunded</option>
+            </select>
+            <button class="update-status-btn" data-orderid="${order.order_id}" style="background:var(--terracotta); color:#fff; border:none; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer;">Update</button>
+            <span class="status-msg-${order.order_id}" style="font-size:12px;"></span>
+          </div>
+
           ${itemsHtml}
         `;
-
         listEl.appendChild(card);
+      });
+
+
+      document.querySelectorAll(".update-status-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const orderId = btn.getAttribute("data-orderid");
+          const select = document.querySelector(`.status-select[data-orderid="${orderId}"]`);
+          const newStatus = select.value;
+          const msgEl = document.querySelector(`.status-msg-${orderId}`);
+
+          const { error } = await productsClient
+            .from("orders")
+            .update({ order_status: newStatus })
+            .eq("order_id", orderId);
+
+          if (error) {
+            msgEl.textContent = "❌ " + error.message;
+            msgEl.style.color = "red";
+            return;
+          }
+
+          msgEl.textContent = "✅ Updated!";
+          msgEl.style.color = "green";
+
+          const orderInMemory = allOrders.find(o => o.order_id === orderId);
+          if (orderInMemory) orderInMemory.order_status = newStatus;
+        });
       });
 
       document.querySelectorAll(".gen-qr-btn").forEach(btn => {
@@ -141,9 +184,7 @@
       await productsClient.auth.signOut();
       window.location.href = "login.html";
     });
-
     alert("QRCode loaded? " + (typeof QRCode));
-
     checkLoginAndLoad();
   </script>
 </body>
