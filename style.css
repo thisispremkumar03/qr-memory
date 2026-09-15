@@ -1,3 +1,4 @@
+/* ===== OUR MEMORIES — DESIGN SYSTEM ===== */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 * {
@@ -496,4 +497,31 @@ h1, h2, .names {
   color: var(--brown-soft);
   line-height: 1.7;
   margin-bottom: 24px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.filter-btn {
+  background: var(--white);
+  border: 1px solid #EADFD2;
+  color: var(--brown-soft);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-btn.active {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: #fff;
 }
