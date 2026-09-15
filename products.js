@@ -38,6 +38,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products.js"></script>
   <script>
+    alert("script running");
         let allProductsData = [];
 
 async function loadAllProducts() {
