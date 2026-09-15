@@ -37,65 +37,64 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products.js"></script>
-    alert("script running");
   <script>
-        let allProductsData = [];
+    let allProductsData = [];
 
-async function loadAllProducts() {
-  const container = document.getElementById("all-products");
-  allProductsData = await fetchAllProducts();
+    async function loadAllProducts() {
+      const container = document.getElementById("all-products");
+      allProductsData = await fetchAllProducts();
 
-  if (allProductsData.length === 0) {
-    container.innerHTML = `<p style="color:#999;">No gifts available right now — check back soon.</p>`;
-    return;
-  }
+      if (allProductsData.length === 0) {
+        container.innerHTML = `<p style="color:#999;">No gifts available right now — check back soon.</p>`;
+        return;
+      }
 
-  renderProducts(allProductsData);
-}
-
-function renderProducts(products) {
-  const container = document.getElementById("all-products");
-
-  if (products.length === 0) {
-    container.innerHTML = `<p style="color:#999;">No gifts match this filter yet.</p>`;
-    return;
-  }
-
-  container.innerHTML = "";
-
-  products.forEach(product => {
-    const card = document.createElement("a");
-    card.href = `product.html?id=${product.product_id}`;
-    card.className = "product-card product-card-link";
-    card.innerHTML = `
-      <div class="product-img-placeholder">🎁</div>
-      <p class="product-name">${product.name}</p>
-      <p class="product-desc">${product.short_description || ""}</p>
-      <p class="product-price">₹${product.price}</p>
-    `;
-    container.appendChild(card);
-  });
-}
-
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    const occasion = btn.getAttribute("data-occasion");
-
-    if (occasion === "all") {
       renderProducts(allProductsData);
-    } else {
-      const filtered = allProductsData.filter(p =>
-        (p.occasion_tags || "").split(",").map(t => t.trim()).includes(occasion)
-      );
-      renderProducts(filtered);
     }
-  });
-});
 
-loadAllProducts();
+    function renderProducts(products) {
+      const container = document.getElementById("all-products");
+
+      if (products.length === 0) {
+        container.innerHTML = `<p style="color:#999;">No gifts match this filter yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+
+      products.forEach(product => {
+        const card = document.createElement("a");
+        card.href = `product.html?id=${product.product_id}`;
+        card.className = "product-card product-card-link";
+        card.innerHTML = `
+          <div class="product-img-placeholder">🎁</div>
+          <p class="product-name">${product.name}</p>
+          <p class="product-desc">${product.short_description || ""}</p>
+          <p class="product-price">₹${product.price}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const occasion = btn.getAttribute("data-occasion");
+
+        if (occasion === "all") {
+          renderProducts(allProductsData);
+        } else {
+          const filtered = allProductsData.filter(p =>
+            (p.occasion_tags || "").split(",").map(t => t.trim()).includes(occasion)
+          );
+          renderProducts(filtered);
+        }
+      });
+    });
+
+    loadAllProducts();
   </script>
 </body>
 </html>
