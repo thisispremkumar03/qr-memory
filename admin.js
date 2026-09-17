@@ -18,6 +18,35 @@ document.getElementById("create-btn").addEventListener("click", async () => {
 
 
 
+  const audioFile = document.getElementById("input-audio-file").files[0];
+  const audioStatus = document.getElementById("audio-upload-status");
+  let audioUrl = "";
+
+  if (audioFile) {
+    audioStatus.textContent = "Uploading audio...";
+
+    const audioFileName = `${memoryId}-${Date.now()}.${audioFile.name.split('.').pop()}`;
+
+    const { error: audioUploadError } = await supabaseClient
+      .storage
+      .from("memory-audio")
+      .upload(audioFileName, audioFile);
+
+    if (audioUploadError) {
+      audioStatus.textContent = "❌ Audio upload failed: " + audioUploadError.message;
+      return;
+    }
+
+    const { data: audioUrlData } = supabaseClient
+      .storage
+      .from("memory-audio")
+      .getPublicUrl(audioFileName);
+
+    audioUrl = audioUrlData.publicUrl;
+    audioStatus.textContent = "✅ Audio uploaded!";
+  }
+
+
 
   const videoFile = document.getElementById("input-video-file").files[0];
   const videoStatus = document.getElementById("video-upload-status");
@@ -103,10 +132,12 @@ document.getElementById("create-btn").addEventListener("click", async () => {
         memory_date: memoryDate || null,
         song_url: songUrl || null,
         photo_urls: photoUrls || null,
-        video_url: videoUrl || null
+        video_url: videoUrl || null,
+        audio_url: audioUrl || null
       }
     ]);
 
+    
   if (error) {
     console.error(error);
     resultMsg.textContent = "❌ Error: " + error.message;
