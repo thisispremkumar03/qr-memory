@@ -54,6 +54,12 @@ function fillPage(data) {
     document.getElementById("memory-video").src = data.video_url;
   }
 
+
+  if (data.audio_url) {
+    document.getElementById("audio-box").style.display = "block";
+    document.getElementById("memory-audio").src = data.audio_url;
+  }
+
   // We'll wire up real photos in Step 9 — placeholder stays for now
 
 
