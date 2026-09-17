@@ -16,6 +16,40 @@ document.getElementById("create-btn").addEventListener("click", async () => {
   const photoFiles = document.getElementById("input-photo-files").files;
   const uploadStatus = document.getElementById("upload-status");
 
+
+
+
+  const videoFile = document.getElementById("input-video-file").files[0];
+  const videoStatus = document.getElementById("video-upload-status");
+  let videoUrl = "";
+
+  if (videoFile) {
+    videoStatus.textContent = "Uploading video...";
+
+    const videoFileName = `${memoryId}-${Date.now()}.${videoFile.name.split('.').pop()}`;
+
+    const { error: videoUploadError } = await supabaseClient
+      .storage
+      .from("memory-videos")
+      .upload(videoFileName, videoFile);
+
+    if (videoUploadError) {
+      videoStatus.textContent = "❌ Video upload failed: " + videoUploadError.message;
+      return;
+    }
+
+    const { data: videoUrlData } = supabaseClient
+      .storage
+      .from("memory-videos")
+      .getPublicUrl(videoFileName);
+
+    videoUrl = videoUrlData.publicUrl;
+    videoStatus.textContent = "✅ Video uploaded!";
+  }
+
+
+
+
   let photoUrls = "";
 
   alert("Reached photo check. Files: " + photoFiles.length);
@@ -68,7 +102,8 @@ document.getElementById("create-btn").addEventListener("click", async () => {
         message: message,
         memory_date: memoryDate || null,
         song_url: songUrl || null,
-        photo_urls: photoUrls || null
+        photo_urls: photoUrls || null,
+        video_url: videoUrl || null
       }
     ]);
 
