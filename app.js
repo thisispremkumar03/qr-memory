@@ -48,6 +48,12 @@ function fillPage(data) {
     document.getElementById("song-box").style.display = "none";
   }
 
+
+  if (data.video_url) {
+    document.getElementById("video-box").style.display = "block";
+    document.getElementById("memory-video").src = data.video_url;
+  }
+
   // We'll wire up real photos in Step 9 — placeholder stays for now
 
 
