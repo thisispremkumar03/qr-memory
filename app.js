@@ -38,8 +38,10 @@ function fillPage(data) {
   document.getElementById("name2").textContent = data.name2 || "";
   document.getElementById("message").innerHTML = `"${data.message || ""}"`;
 
-  if (data.memory_date) {
-    document.getElementById("memory-date").textContent = "📅 " + data.memory_date;
+    if (data.memory_date) {
+    const dateParts = data.memory_date.split("-"); // format: YYYY-MM-DD
+    const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // DD/MM/YYYY
+    document.getElementById("memory-date").textContent = formattedDate;
   }
 
   if (data.song_url) {
